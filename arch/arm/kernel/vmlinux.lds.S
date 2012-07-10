@@ -162,6 +162,70 @@ SECTIONS
 
 	_etext = .;			/* End of text and rodata section */
 
+#ifndef CONFIG_XIP_KERNEL
+#ifdef CONFIG_STRICT_MEMORY_RWX
+	. = ALIGN(1<<SECTION_SHIFT);
+#else
+	. = ALIGN(PAGE_SIZE);
+#endif
+	__init_begin = .;
+#endif
+
+	INIT_TEXT_SECTION(8)
+	.exit.text : {
+		ARM_EXIT_KEEP(EXIT_TEXT)
+	}
+	.init.proc.info : {
+		ARM_CPU_DISCARD(PROC_INFO)
+	}
+	.init.arch.info : {
+		__arch_info_begin = .;
+		*(.arch.info.init)
+		__arch_info_end = .;
+	}
+	.init.tagtable : {
+		__tagtable_begin = .;
+		*(.taglist.init)
+		__tagtable_end = .;
+	}
+#ifdef CONFIG_SMP_ON_UP
+	.init.smpalt : {
+		__smpalt_begin = .;
+		*(.alt.smp.init)
+		__smpalt_end = .;
+	}
+#endif
+	.init.pv_table : {
+		__pv_table_begin = .;
+		*(.pv_table)
+		__pv_table_end = .;
+	}
+	.init.data : {
+#ifndef CONFIG_XIP_KERNEL
+		INIT_DATA
+#endif
+		INIT_SETUP(16)
+		INIT_CALLS
+		CON_INITCALL
+		COMPAT_EXPORTS
+		SECURITY_INITCALL
+		INIT_RAM_FS
+	}
+#ifndef CONFIG_XIP_KERNEL
+#ifdef CONFIG_STRICT_MEMORY_RWX
+	. = ALIGN(1<<SECTION_SHIFT);
+#endif
+	__init_data = .;
+	.exit.data : {
+		ARM_EXIT_KEEP(EXIT_DATA)
+	}
+#endif
+
+#if !defined(CONFIG_SMP) && !defined(CONFIG_XIP_KERNEL)
+	. = ALIGN(THREAD_SIZE);
+#endif
+	PERCPU_SECTION(L1_CACHE_BYTES)
+
 #ifdef CONFIG_XIP_KERNEL
 	__data_loc = ALIGN(4);		/* location in binary */
 	. = PAGE_OFFSET + TEXT_OFFSET;
