@@ -161,7 +161,7 @@ SECTIONS
 #endif
 
 	_etext = .;			/* End of text and rodata section */
-
+/*
 #ifndef CONFIG_XIP_KERNEL
 #ifdef CONFIG_STRICT_MEMORY_RWX
 	. = ALIGN(1<<SECTION_SHIFT);
@@ -188,6 +188,7 @@ SECTIONS
 		*(.taglist.init)
 		__tagtable_end = .;
 	}
+
 #ifdef CONFIG_SMP_ON_UP
 	.init.smpalt : {
 		__smpalt_begin = .;
@@ -211,6 +212,7 @@ SECTIONS
 		SECURITY_INITCALL
 		INIT_RAM_FS
 	}
+
 #ifndef CONFIG_XIP_KERNEL
 #ifdef CONFIG_STRICT_MEMORY_RWX
 	. = ALIGN(1<<SECTION_SHIFT);
@@ -225,7 +227,7 @@ SECTIONS
 	. = ALIGN(THREAD_SIZE);
 #endif
 	PERCPU_SECTION(L1_CACHE_BYTES)
-
+*/
 #ifdef CONFIG_XIP_KERNEL
 	__data_loc = ALIGN(4);		/* location in binary */
 	. = PAGE_OFFSET + TEXT_OFFSET;
