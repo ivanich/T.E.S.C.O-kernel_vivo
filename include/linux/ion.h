@@ -273,14 +273,18 @@ void ion_client_destroy(struct ion_client *client);
  * @len:	size of the allocation
  * @align:	requested allocation alignment, lots of hardware blocks have
  *		alignment requirements of some kind
- * @flags:	mask of heaps to allocate from, if multiple bits are set
- *		heaps will be tried in order from lowest to highest order bit
+ * @heap_mask: mask of heaps to allocate from, if multiple bits are set
+ *             heaps will be tried in order from lowest to highest order bit
+ * @flags:     heap flags, the low 16 bits are consumed by ion, the high 16
+ *             bits are passed on to the respective heap and can be heap
+ *             custom
  *
  * Allocate memory in one of the heaps provided in heap mask and return
  * an opaque handle to it.
  */
 struct ion_handle *ion_alloc(struct ion_client *client, size_t len,
-			     size_t align, unsigned int flags);
+                            size_t align, unsigned int heap_mask,
+                            unsigned int flags);
 
 /**
  * ion_free - free a handle
@@ -538,7 +542,9 @@ static inline struct ion_client *msm_ion_client_create(unsigned int heap_mask,
 static inline void ion_client_destroy(struct ion_client *client) { }
 
 static inline struct ion_handle *ion_alloc(struct ion_client *client,
-			size_t len, size_t align, unsigned int flags)
+                                       size_t len, size_t align,
+                                       unsigned int heap_mask,
+                                       unsigned int flags)
 {
 	return ERR_PTR(-ENODEV);
 }
@@ -655,6 +661,7 @@ static inline int msm_ion_do_cache_op(struct ion_client *client,
  * struct ion_allocation_data - metadata passed from userspace for allocations
  * @len:	size of the allocation
  * @align:	required alignment of the allocation
+ * @heap_mask: mask of heaps to allocate from
  * @flags:	flags passed to heap
  * @handle:	pointer that will be populated with a cookie to use to refer
  *		to this allocation
@@ -665,6 +672,7 @@ struct ion_allocation_data {
 	size_t len;
 	size_t align;
 	unsigned int flags;
+	unsigned int heap_mask;
 	struct ion_handle *handle;
 };
 
