@@ -76,6 +76,10 @@
 #define MSMFB_WRITEBACK_SET_MIRRORING_HINT _IOW(MSMFB_IOCTL_MAGIC, 165, \
 						unsigned int)
 #define MSMFB_METADATA_GET  _IOW(MSMFB_IOCTL_MAGIC, 166, struct msmfb_metadata)
+#define MSMFB_OVERLAY_CHANGE_ZORDER_VG_PIPES    _IOW(MSMFB_IOCTL_MAGIC, 200, unsigned int)
+#define MSMFB_GET_GAMMA_CURVY _IOWR(MSMFB_IOCTL_MAGIC, 201, struct gamma_curvy)
+#define MSMFB_GET_USB_PROJECTOR_INFO _IOR(MSMFB_IOCTL_MAGIC, 301, struct msmfb_usb_projector_info)
+#define MSMFB_SET_USB_PROJECTOR_INFO _IOW(MSMFB_IOCTL_MAGIC, 302, struct msmfb_usb_projector_info)
 
 #define FB_TYPE_3D_PANEL 0x10101010
 #define MDP_IMGTYPE2_START 0x10000
@@ -564,7 +568,7 @@ struct mdp_mixer_info {
 	int z_order;
 };
 
-#define MAX_PIPE_PER_MIXER  5
+#define MAX_PIPE_PER_MIXER  4
 
 struct msmfb_mixer_info_req {
 	int mixer_num;
@@ -587,16 +591,21 @@ enum {
 #ifdef __KERNEL__
 
 /* get the framebuffer physical address information */
-int get_fb_phys_info(unsigned long *start, unsigned long *len, int fb_num,
-	int subsys_id);
+int get_fb_phys_info(unsigned long *start, unsigned long *len, int fb_num);
 struct fb_info *msm_fb_get_writeback_fb(void);
 int msm_fb_writeback_init(struct fb_info *info);
 int msm_fb_writeback_start(struct fb_info *info);
+int msm_fb_writeback_stop(struct fb_info *info);
+int msm_fb_writeback_register_buffer(struct fb_info *info,
+               struct msmfb_writeback_data *data);
+
 int msm_fb_writeback_queue_buffer(struct fb_info *info,
 		struct msmfb_data *data);
 int msm_fb_writeback_dequeue_buffer(struct fb_info *info,
 		struct msmfb_data *data);
 int msm_fb_writeback_stop(struct fb_info *info);
+int msm_fb_writeback_unregister_buffer(struct fb_info *info,
+               struct msmfb_writeback_data *data);
 int msm_fb_writeback_terminate(struct fb_info *info);
 #endif
 
